@@ -14,7 +14,9 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
         _fixture = fixture;
     }
 
-
+    /// <summary>
+    /// Проверяет получение пяти ресторанов с максимальным количеством заказов
+    /// </summary>
     [Fact]
     public void GetTopFiveRestaurantsByOrderCount()
     {
@@ -37,7 +39,9 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
         Assert.Equal(4, result[0].OrderCount);
     }
 
-
+    /// <summary>
+    /// Проверяет получение заказов с минимальным временем доставки
+    /// </summary>
     [Fact]
     public void GetOrdersWithMinimumDeliveryTime()
     {
@@ -67,7 +71,9 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
         );
     }
 
-
+    /// <summary>
+    /// Проверяет получение клиентов выбранного ресторана
+    /// </summary>
     [Fact]
     public void GetClientsByRestaurant()
     {
@@ -90,7 +96,9 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
         );
     }
 
-
+    /// <summary>
+    /// Проверяет расчёт статистики заказов по ресторанам 
+    /// </summary>
     [Fact]
     public void GetOrderStatisticsByRestaurant()
     {
@@ -117,6 +125,9 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
         });
     }
 
+    /// <summary>
+    /// Проверяет поиск клиента с максимальной суммой заказа
+    /// </summary>
     [Fact]
     public void GetClientWithMaximumSpentAmount()
     {

@@ -2,19 +2,43 @@
 
 namespace EnterpriseDevelopment.Domain;
 
+/// <summary>
+/// генератор текстовых данных
+/// </summary>
 public class DataSeeder
 {
+    /// <summary>
+    /// Список категорий блюд
+    /// </summary>
     public List<DishCategory> Categories { get; }
 
+
+    /// <summary>
+    /// Список ресторанов
+    /// </summary>
     public List<Restaurant> Restaurants { get; }
 
+
+    /// <summary>
+    /// Список клиентов
+    /// </summary>
     public List<Client> Clients { get; }
 
+
+    /// <summary>
+    /// Список блюд
+    /// </summary>
     public List<Dish> Dishes { get; }
 
+
+    /// <summary>
+    /// Список заказов
+    /// </summary>
     public List<Order> Orders { get; }
 
-
+    /// <summary>
+    /// Инициализация текстовых данных
+    /// </summary>
     public DataSeeder()
     {
         Categories = CreateCategories();
@@ -28,7 +52,10 @@ public class DataSeeder
         Orders = CreateOrders(Clients, Restaurants);
     }
 
-
+    /// <summary>
+    /// Создаёт список категорий блюд
+    /// </summary>
+    /// <returns>Список категорий блюд</returns>
     private static List<DishCategory> CreateCategories()
     {
         return new List<DishCategory>
@@ -95,7 +122,10 @@ public class DataSeeder
         };
     }
 
-
+    /// <summary>
+    /// Создаёт список ресторанов
+    /// </summary>
+    /// <returns>Список ресторанов</returns>
     private static List<Restaurant> CreateRestaurants()
     {
         return new List<Restaurant>
@@ -203,6 +233,10 @@ public class DataSeeder
         };
     }
 
+    /// <summary>
+    /// Создаёт список клиентов
+    /// </summary>
+    /// <returns>Список клиентов</returns>
     private static List<Client> CreateClients()
     {
         return new List<Client>
@@ -289,6 +323,10 @@ public class DataSeeder
         };
     }
 
+    /// <summary>
+    /// Создаёт список блюд
+    /// </summary>
+    /// <returns>Список блюд</returns>
     private static List<Dish> CreateDishes(
     List<DishCategory> categories,
     List<Restaurant> restaurants)
@@ -467,6 +505,10 @@ public class DataSeeder
 
     }
 
+    /// <summary>
+    /// Создаёт список заказов
+    /// </summary>
+    /// <returns>Список заказов</returns>
     private static List<Order> CreateOrders(List<Client> clients, List<Restaurant> restaurants)
     {
         return new List<Order>
