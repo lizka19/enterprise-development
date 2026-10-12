@@ -1,13 +1,10 @@
 ﻿using Xunit;
 
-
 namespace EnterpriseDevelopment.Domain.Tests;
-
 
 public class QueriesTests : IClassFixture<FoodDeliveryFixture>
 {
     private readonly FoodDeliveryFixture _fixture;
-
 
     public QueriesTests(FoodDeliveryFixture fixture)
     {
@@ -28,15 +25,26 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
                 OrderCount = group.Count()
             })
             .OrderByDescending(item => item.OrderCount)
+            .ThenBy(item => item.RestaurantId)
             .Take(5)
             .ToList();
-
 
         Assert.Equal(5, result.Count);
 
         Assert.Equal(1, result[0].RestaurantId);
-
         Assert.Equal(4, result[0].OrderCount);
+
+        Assert.Equal(2, result[1].RestaurantId);
+        Assert.Equal(3, result[1].OrderCount);
+
+        Assert.Equal(3, result[2].RestaurantId);
+        Assert.Equal(3, result[2].OrderCount);
+
+        Assert.Equal(4, result[3].RestaurantId);
+        Assert.Equal(1, result[3].OrderCount);
+
+        Assert.Equal(5, result[4].RestaurantId);
+        Assert.Equal(1, result[4].OrderCount);
     }
 
     /// <summary>
@@ -45,30 +53,18 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
     [Fact]
     public void GetOrdersWithMinimumDeliveryTime()
     {
-        var result = _fixture.Data.Orders
-            .Select(order => new
-            {
-                Order = order,
-                DeliveryTime = order.DeliveredAt - order.CreatedAt
-            })
-            .OrderBy(item => item.DeliveryTime)
+        var minimumTime = _fixture.Data.Orders
+            .Min(order => order.DeliveryTime);
+
+        var fastestOrders = _fixture.Data.Orders
+            .Where(order => order.DeliveryTime == minimumTime)
+            .OrderBy(order => order.Id)
             .ToList();
 
-
-        var minimumTime = result.First().DeliveryTime;
-
-
-        var fastestOrders = result
-            .Where(item => item.DeliveryTime == minimumTime)
-            .ToList();
-
-
-        Assert.NotEmpty(fastestOrders);
-
-        Assert.Equal(
-            TimeSpan.FromMinutes(15),
-            minimumTime
-        );
+        Assert.Equal(TimeSpan.FromMinutes(15), minimumTime);
+        Assert.Equal(2, fastestOrders.Count);
+        Assert.Equal(8, fastestOrders[0].Id);
+        Assert.Equal(10, fastestOrders[1].Id);
     }
 
     /// <summary>
@@ -79,7 +75,6 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
     {
         var restaurantId = 1;
 
-
         var result = _fixture.Data.Orders
             .Where(order => order.RestaurantId == restaurantId)
             .Select(order => order.Client)
@@ -87,65 +82,55 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
             .OrderBy(client => client.FullName)
             .ToList();
 
-
-        Assert.NotEmpty(result);
-
-        Assert.Equal(
-            result.OrderBy(client => client.FullName),
-            result
-        );
+        Assert.Equal(3, result.Count);
+        Assert.Equal("Иванов Иван Иванович", result[0].FullName);
+        Assert.Equal("Петров Пётр Сергеевич", result[1].FullName);
+        Assert.Equal("Сидорова Анна Андреевна", result[2].FullName);
     }
 
     /// <summary>
-    /// Проверяет расчёт статистики заказов по ресторанам 
+    /// Проверяет расчёт статистики заказов
     /// </summary>
     [Fact]
-    public void GetOrderStatisticsByRestaurant()
+    public void GetOrderStatistics()
     {
-        var result = _fixture.Data.Orders
-            .GroupBy(order => order.RestaurantId)
-            .Select(group => new
-            {
-                RestaurantId = group.Key,
-                OrderCount = group.Count(),
-                AverageAmount = group.Average(order => order.TotalAmount),
-                TotalAmount = group.Sum(order => order.TotalAmount)
-            })
-            .ToList();
-
-
-        Assert.NotEmpty(result);
-
-
-        Assert.All(result, item =>
+        var result = new
         {
-            Assert.True(item.OrderCount > 0);
-            Assert.True(item.AverageAmount > 0);
-            Assert.True(item.TotalAmount > 0);
-        });
+            OrderCount = _fixture.Data.Orders.Count,
+            AverageAmount = _fixture.Data.Orders.Average(order => order.TotalAmount),
+            TotalAmount = _fixture.Data.Orders.Sum(order => order.TotalAmount)
+        };
+
+        Assert.Equal(12, result.OrderCount);
+        Assert.Equal(1087.5m, result.AverageAmount);
+        Assert.Equal(13050m, result.TotalAmount);
     }
 
     /// <summary>
-    /// Проверяет поиск клиента с максимальной суммой заказа
+    /// Проверяет поиск клиентов с максимальной общей суммой заказов
     /// </summary>
     [Fact]
-    public void GetClientWithMaximumSpentAmount()
+    public void GetClientsWithMaximumSpentAmount()
     {
-        var result = _fixture.Data.Orders
+        var clientTotals = _fixture.Data.Orders
             .GroupBy(order => order.ClientId)
             .Select(group => new
             {
                 ClientId = group.Key,
                 TotalSpent = group.Sum(order => order.TotalAmount)
             })
-            .OrderByDescending(item => item.TotalSpent)
-            .First();
+            .ToList();
 
+        var maximumSpentAmount = clientTotals
+            .Max(item => item.TotalSpent);
 
-        Assert.NotNull(result);
+        var result = clientTotals
+            .Where(item => item.TotalSpent == maximumSpentAmount)
+            .OrderBy(item => item.ClientId)
+            .ToList();
 
-        Assert.Equal(1, result.ClientId);
-
-        Assert.Equal(7300, result.TotalSpent);
+        Assert.Single(result);
+        Assert.Equal(1, result[0].ClientId);
+        Assert.Equal(5390m, result[0].TotalSpent);
     }
 }

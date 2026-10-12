@@ -3,7 +3,7 @@
 namespace EnterpriseDevelopment.Domain;
 
 /// <summary>
-/// генератор текстовых данных
+/// Генератор тестовых данных
 /// </summary>
 public class DataSeeder
 {
@@ -12,24 +12,20 @@ public class DataSeeder
     /// </summary>
     public List<DishCategory> Categories { get; }
 
-
     /// <summary>
     /// Список ресторанов
     /// </summary>
     public List<Restaurant> Restaurants { get; }
-
 
     /// <summary>
     /// Список клиентов
     /// </summary>
     public List<Client> Clients { get; }
 
-
     /// <summary>
     /// Список блюд
     /// </summary>
     public List<Dish> Dishes { get; }
-
 
     /// <summary>
     /// Список заказов
@@ -37,19 +33,15 @@ public class DataSeeder
     public List<Order> Orders { get; }
 
     /// <summary>
-    /// Инициализация текстовых данных
+    /// Инициализация тестовых данных
     /// </summary>
     public DataSeeder()
     {
         Categories = CreateCategories();
-
         Restaurants = CreateRestaurants();
-
         Clients = CreateClients();
-
         Dishes = CreateDishes(Categories, Restaurants);
-
-        Orders = CreateOrders(Clients, Restaurants);
+        Orders = CreateOrders(Clients, Restaurants, Dishes);
     }
 
     /// <summary>
@@ -70,7 +62,7 @@ public class DataSeeder
             {
                 Id = 2,
                 Name = "Суши"
-            },
+            }, 
 
             new()
             {
@@ -107,7 +99,6 @@ public class DataSeeder
                 Id = 8,
                 Name = "Закуски"
             },
-
             new()
             {
                 Id = 9,
@@ -199,7 +190,6 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(10, 0),
                 ClosingTime = new TimeOnly(22, 0)
             },
-
 
             new()
             {
@@ -328,8 +318,8 @@ public class DataSeeder
     /// </summary>
     /// <returns>Список блюд</returns>
     private static List<Dish> CreateDishes(
-    List<DishCategory> categories,
-    List<Restaurant> restaurants)
+        List<DishCategory> categories,
+        List<Restaurant> restaurants)
     {
         return new List<Dish>
         {
@@ -339,10 +329,8 @@ public class DataSeeder
                 Name = "Пепперони",
                 WeightInGrams = 450,
                 Price = 520,
-
                 CategoryId = 1,
                 Category = categories[0],
-
                 RestaurantId = 1,
                 Restaurant = restaurants[0]
             },
@@ -353,10 +341,8 @@ public class DataSeeder
                 Name = "Маргарита",
                 WeightInGrams = 420,
                 Price = 450,
-
                 CategoryId = 1,
                 Category = categories[0],
-
                 RestaurantId = 1,
                 Restaurant = restaurants[0]
             },
@@ -367,10 +353,8 @@ public class DataSeeder
                 Name = "Филадельфия",
                 WeightInGrams = 260,
                 Price = 650,
-
                 CategoryId = 2,
                 Category = categories[1],
-
                 RestaurantId = 2,
                 Restaurant = restaurants[1]
             },
@@ -381,10 +365,8 @@ public class DataSeeder
                 Name = "Калифорния",
                 WeightInGrams = 240,
                 Price = 590,
-
                 CategoryId = 2,
                 Category = categories[1],
-
                 RestaurantId = 2,
                 Restaurant = restaurants[1]
             },
@@ -395,10 +377,8 @@ public class DataSeeder
                 Name = "Чизбургер",
                 WeightInGrams = 320,
                 Price = 390,
-
                 CategoryId = 3,
                 Category = categories[2],
-
                 RestaurantId = 3,
                 Restaurant = restaurants[2]
             },
@@ -409,10 +389,8 @@ public class DataSeeder
                 Name = "Хачапури по-аджарски",
                 WeightInGrams = 400,
                 Price = 480,
-
                 CategoryId = 10,
                 Category = categories[9],
-
                 RestaurantId = 4,
                 Restaurant = restaurants[3]
             },
@@ -423,10 +401,8 @@ public class DataSeeder
                 Name = "Борщ",
                 WeightInGrams = 350,
                 Price = 300,
-
                 CategoryId = 4,
                 Category = categories[3],
-
                 RestaurantId = 5,
                 Restaurant = restaurants[4]
             },
@@ -437,10 +413,8 @@ public class DataSeeder
                 Name = "Карбонара",
                 WeightInGrams = 330,
                 Price = 510,
-
                 CategoryId = 9,
                 Category = categories[8],
-
                 RestaurantId = 6,
                 Restaurant = restaurants[5]
             },
@@ -451,10 +425,8 @@ public class DataSeeder
                 Name = "Шашлык из свинины",
                 WeightInGrams = 300,
                 Price = 560,
-
                 CategoryId = 10,
                 Category = categories[9],
-
                 RestaurantId = 7,
                 Restaurant = restaurants[6]
             },
@@ -465,10 +437,8 @@ public class DataSeeder
                 Name = "Цезарь",
                 WeightInGrams = 250,
                 Price = 420,
-
                 CategoryId = 5,
                 Category = categories[4],
-
                 RestaurantId = 8,
                 Restaurant = restaurants[7]
             },
@@ -479,10 +449,8 @@ public class DataSeeder
                 Name = "Чизкейк",
                 WeightInGrams = 180,
                 Price = 350,
-
                 CategoryId = 6,
                 Category = categories[5],
-
                 RestaurantId = 9,
                 Restaurant = restaurants[8]
             },
@@ -493,236 +461,171 @@ public class DataSeeder
                 Name = "Лимонад",
                 WeightInGrams = 500,
                 Price = 230,
-
                 CategoryId = 7,
                 Category = categories[6],
-
                 RestaurantId = 10,
                 Restaurant = restaurants[9]
             }
         };
-
-
     }
 
     /// <summary>
     /// Создаёт список заказов
     /// </summary>
+    /// <param name="clients">Список клиентов</param>
+    /// <param name="restaurants">Список ресторанов</param>
+    /// <param name="dishes">Список блюд</param>
     /// <returns>Список заказов</returns>
-    private static List<Order> CreateOrders(List<Client> clients, List<Restaurant> restaurants)
+    private static List<Order> CreateOrders(
+        List<Client> clients,
+        List<Restaurant> restaurants,
+        List<Dish> dishes)
     {
         return new List<Order>
         {
             new()
             {
                 Id = 1,
-
                 ClientId = 1,
                 Client = clients[0],
-
                 RestaurantId = 1,
                 Restaurant = restaurants[0],
-
+                Dishes = [dishes[0], dishes[1]],
                 CreatedAt = new DateTimeOffset(2026, 9, 1, 12, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 1, 12, 30, 0, TimeSpan.Zero),
-
-                TotalAmount = 1200
+                DeliveredAt = new DateTimeOffset(2026, 9, 1, 12, 30, 0, TimeSpan.Zero)
             },
 
             new()
             {
                 Id = 2,
-
                 ClientId = 2,
                 Client = clients[1],
-
                 RestaurantId = 1,
                 Restaurant = restaurants[0],
-
+                Dishes = [dishes[1], dishes[1]],
                 CreatedAt = new DateTimeOffset(2026, 9, 2, 13, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 2, 13, 25, 0, TimeSpan.Zero),
-
-                TotalAmount = 900
+                DeliveredAt = new DateTimeOffset(2026, 9, 2, 13, 25, 0, TimeSpan.Zero)
             },
 
             new()
             {
                 Id = 3,
-
                 ClientId = 3,
                 Client = clients[2],
-
                 RestaurantId = 1,
                 Restaurant = restaurants[0],
-
+                Dishes = [dishes[0], dishes[0], dishes[1]],
                 CreatedAt = new DateTimeOffset(2026, 9, 3, 18, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 3, 18, 20, 0, TimeSpan.Zero),
-
-                TotalAmount = 1500
+                DeliveredAt = new DateTimeOffset(2026, 9, 3, 18, 20, 0, TimeSpan.Zero)
             },
 
             new()
             {
                 Id = 4,
-
                 ClientId = 1,
                 Client = clients[0],
-
                 RestaurantId = 1,
                 Restaurant = restaurants[0],
-
+                Dishes = [dishes[0], dishes[1], dishes[1]],
                 CreatedAt = new DateTimeOffset(2026, 9, 4, 19, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 4, 19, 20, 0, TimeSpan.Zero),
-
-                TotalAmount = 1800
+                DeliveredAt = new DateTimeOffset(2026, 9, 4, 19, 20, 0, TimeSpan.Zero)
             },
-
 
             new()
             {
                 Id = 5,
-
                 ClientId = 4,
                 Client = clients[3],
-
                 RestaurantId = 2,
                 Restaurant = restaurants[1],
-
+                Dishes = [dishes[2], dishes[3]],
                 CreatedAt = new DateTimeOffset(2026, 9, 5, 12, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 5, 12, 40, 0, TimeSpan.Zero),
-
-                TotalAmount = 1100
+                DeliveredAt = new DateTimeOffset(2026, 9, 5, 12, 40, 0, TimeSpan.Zero)
             },
-
 
             new()
             {
                 Id = 6,
-
                 ClientId = 5,
                 Client = clients[4],
-
                 RestaurantId = 2,
                 Restaurant = restaurants[1],
-
+                Dishes = [dishes[2], dishes[2]],
                 CreatedAt = new DateTimeOffset(2026, 9, 6, 14, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 6, 14, 35, 0, TimeSpan.Zero),
-
-                TotalAmount = 1400
+                DeliveredAt = new DateTimeOffset(2026, 9, 6, 14, 35, 0, TimeSpan.Zero)
             },
-
 
             new()
             {
                 Id = 7,
-
                 ClientId = 1,
                 Client = clients[0],
-
                 RestaurantId = 2,
                 Restaurant = restaurants[1],
-
+                Dishes = [dishes[2], dishes[3], dishes[3]],
                 CreatedAt = new DateTimeOffset(2026, 9, 7, 18, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 7, 18, 45, 0, TimeSpan.Zero),
-
-                TotalAmount = 2000
+                DeliveredAt = new DateTimeOffset(2026, 9, 7, 18, 45, 0, TimeSpan.Zero)
             },
-
 
             new()
             {
                 Id = 8,
-
                 ClientId = 6,
                 Client = clients[5],
-
                 RestaurantId = 3,
                 Restaurant = restaurants[2],
-
+                Dishes = [dishes[4], dishes[4]],
                 CreatedAt = new DateTimeOffset(2026, 9, 8, 16, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 8, 16, 15, 0, TimeSpan.Zero),
-
-                TotalAmount = 750
+                DeliveredAt = new DateTimeOffset(2026, 9, 8, 16, 15, 0, TimeSpan.Zero)
             },
-
 
             new()
             {
                 Id = 9,
-
                 ClientId = 7,
                 Client = clients[6],
-
                 RestaurantId = 3,
                 Restaurant = restaurants[2],
-
+                Dishes = [dishes[4]],
                 CreatedAt = new DateTimeOffset(2026, 9, 9, 16, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 9, 16, 30, 0, TimeSpan.Zero),
-
-                TotalAmount = 800
+                DeliveredAt = new DateTimeOffset(2026, 9, 9, 16, 30, 0, TimeSpan.Zero)
             },
-
 
             new()
             {
                 Id = 10,
-
                 ClientId = 1,
                 Client = clients[0],
-
                 RestaurantId = 3,
                 Restaurant = restaurants[2],
-
+                Dishes = [dishes[4], dishes[4], dishes[4]],
                 CreatedAt = new DateTimeOffset(2026, 9, 10, 16, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 10, 16, 15, 0, TimeSpan.Zero),
-
-                TotalAmount = 2300
+                DeliveredAt = new DateTimeOffset(2026, 9, 10, 16, 15, 0, TimeSpan.Zero)
             },
 
             new()
             {
                 Id = 11,
-
                 ClientId = 8,
                 Client = clients[7],
-
                 RestaurantId = 4,
                 Restaurant = restaurants[3],
-
+                Dishes = [dishes[5], dishes[5]],
                 CreatedAt = new DateTimeOffset(2026, 9, 11, 12, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 11, 12, 25, 0, TimeSpan.Zero),
-
-                TotalAmount = 950
+                DeliveredAt = new DateTimeOffset(2026, 9, 11, 12, 25, 0, TimeSpan.Zero)
             },
 
             new()
             {
                 Id = 12,
-
                 ClientId = 9,
                 Client = clients[8],
-
                 RestaurantId = 5,
                 Restaurant = restaurants[4],
-
+                Dishes = [dishes[6], dishes[6]],
                 CreatedAt = new DateTimeOffset(2026, 9, 12, 13, 0, 0, TimeSpan.Zero),
-
-                DeliveredAt = new DateTimeOffset(2026, 9, 12, 13, 40, 0, TimeSpan.Zero),
-
-                TotalAmount = 700
+                DeliveredAt = new DateTimeOffset(2026, 9, 12, 13, 40, 0, TimeSpan.Zero)
             }
-
         };
     }
 }

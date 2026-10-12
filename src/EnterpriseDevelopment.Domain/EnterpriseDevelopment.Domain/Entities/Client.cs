@@ -10,21 +10,18 @@ public class Client
     /// </summary>
     public int Id { get; set; }
 
-
     /// <summary>
     /// ФИО клиента
     /// </summary>
-    public string FullName { get; set; } = string.Empty;
-
+    public required string FullName { get; set; }
 
     /// <summary>
     /// Номер телефона клиента
     /// </summary>
-    public string PhoneNumber { get; set; } = string.Empty;
-
+    public required string PhoneNumber { get; set; }
 
     /// <summary>
     /// Адрес доставки клиента
     /// </summary>
-    public string DeliveryAddress { get; set; } = string.Empty;
+    public required string DeliveryAddress { get; set; }
 }
