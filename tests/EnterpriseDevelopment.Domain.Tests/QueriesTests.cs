@@ -1,23 +1,20 @@
-﻿using Xunit;
+﻿namespace EnterpriseDevelopment.Domain.Tests;
 
-namespace EnterpriseDevelopment.Domain.Tests;
-
-public class QueriesTests : IClassFixture<FoodDeliveryFixture>
+public class QueriesTests(FoodDeliveryFixture fixture)
+    : IClassFixture<FoodDeliveryFixture>
 {
-    private readonly FoodDeliveryFixture _fixture;
-
-    public QueriesTests(FoodDeliveryFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     /// <summary>
     /// Проверяет получение пяти ресторанов с максимальным количеством заказов
     /// </summary>
     [Fact]
     public void GetTopFiveRestaurantsByOrderCount()
     {
-        var result = _fixture.Data.Orders
+        var expectedCount = 5;
+
+        var expectedRestaurantIds = new[] { 1, 2, 3, 4, 5 };
+        var expectedOrderCounts = new[] { 4, 3, 3, 1, 1 };
+
+        var result = fixture.Data.Orders
             .GroupBy(order => order.RestaurantId)
             .Select(group => new
             {
@@ -29,22 +26,13 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
             .Take(5)
             .ToList();
 
-        Assert.Equal(5, result.Count);
+        Assert.Equal(expectedCount, result.Count);
 
-        Assert.Equal(1, result[0].RestaurantId);
-        Assert.Equal(4, result[0].OrderCount);
-
-        Assert.Equal(2, result[1].RestaurantId);
-        Assert.Equal(3, result[1].OrderCount);
-
-        Assert.Equal(3, result[2].RestaurantId);
-        Assert.Equal(3, result[2].OrderCount);
-
-        Assert.Equal(4, result[3].RestaurantId);
-        Assert.Equal(1, result[3].OrderCount);
-
-        Assert.Equal(5, result[4].RestaurantId);
-        Assert.Equal(1, result[4].OrderCount);
+        for (var i = 0; i < expectedCount; i++)
+        {
+            Assert.Equal(expectedRestaurantIds[i], result[i].RestaurantId);
+            Assert.Equal(expectedOrderCounts[i], result[i].OrderCount);
+        }
     }
 
     /// <summary>
@@ -53,18 +41,22 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
     [Fact]
     public void GetOrdersWithMinimumDeliveryTime()
     {
-        var minimumTime = _fixture.Data.Orders
+        var expectedMinimumTime = TimeSpan.FromMinutes(15);
+        var expectedCount = 2;
+        var expectedOrderIds = new[] { 8, 10 };
+
+        var minimumTime = fixture.Data.Orders
             .Min(order => order.DeliveryTime);
 
-        var fastestOrders = _fixture.Data.Orders
+        var fastestOrders = fixture.Data.Orders
             .Where(order => order.DeliveryTime == minimumTime)
             .OrderBy(order => order.Id)
             .ToList();
 
-        Assert.Equal(TimeSpan.FromMinutes(15), minimumTime);
-        Assert.Equal(2, fastestOrders.Count);
-        Assert.Equal(8, fastestOrders[0].Id);
-        Assert.Equal(10, fastestOrders[1].Id);
+        Assert.Equal(expectedMinimumTime, minimumTime);
+        Assert.Equal(expectedCount, fastestOrders.Count);
+        Assert.Equal(expectedOrderIds[0], fastestOrders[0].Id);
+        Assert.Equal(expectedOrderIds[1], fastestOrders[1].Id);
     }
 
     /// <summary>
@@ -74,18 +66,28 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
     public void GetClientsByRestaurant()
     {
         var restaurantId = 1;
+        var expectedCount = 3;
 
-        var result = _fixture.Data.Orders
+        var expectedClientNames = new[]
+        {
+            "Иванов Иван Иванович",
+            "Петров Пётр Сергеевич",
+            "Сидорова Анна Андреевна"
+        };
+
+        var result = fixture.Data.Orders
             .Where(order => order.RestaurantId == restaurantId)
             .Select(order => order.Client)
             .Distinct()
             .OrderBy(client => client.FullName)
             .ToList();
 
-        Assert.Equal(3, result.Count);
-        Assert.Equal("Иванов Иван Иванович", result[0].FullName);
-        Assert.Equal("Петров Пётр Сергеевич", result[1].FullName);
-        Assert.Equal("Сидорова Анна Андреевна", result[2].FullName);
+        Assert.Equal(expectedCount, result.Count);
+
+        for (var i = 0; i < expectedCount; i++)
+        {
+            Assert.Equal(expectedClientNames[i], result[i].FullName);
+        }
     }
 
     /// <summary>
@@ -94,16 +96,20 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
     [Fact]
     public void GetOrderStatistics()
     {
+        var expectedOrderCount = 12;
+        var expectedAverageAmount = 1087.5m;
+        var expectedTotalAmount = 13050m;
+
         var result = new
         {
-            OrderCount = _fixture.Data.Orders.Count,
-            AverageAmount = _fixture.Data.Orders.Average(order => order.TotalAmount),
-            TotalAmount = _fixture.Data.Orders.Sum(order => order.TotalAmount)
+            OrderCount = fixture.Data.Orders.Count,
+            AverageAmount = fixture.Data.Orders.Average(order => order.TotalAmount),
+            TotalAmount = fixture.Data.Orders.Sum(order => order.TotalAmount)
         };
 
-        Assert.Equal(12, result.OrderCount);
-        Assert.Equal(1087.5m, result.AverageAmount);
-        Assert.Equal(13050m, result.TotalAmount);
+        Assert.Equal(expectedOrderCount, result.OrderCount);
+        Assert.Equal(expectedAverageAmount, result.AverageAmount);
+        Assert.Equal(expectedTotalAmount, result.TotalAmount);
     }
 
     /// <summary>
@@ -112,7 +118,11 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
     [Fact]
     public void GetClientsWithMaximumSpentAmount()
     {
-        var clientTotals = _fixture.Data.Orders
+        var expectedCount = 1;
+        var expectedClientId = 1;
+        var expectedTotalSpent = 5390m;
+
+        var clientTotals = fixture.Data.Orders
             .GroupBy(order => order.ClientId)
             .Select(group => new
             {
@@ -120,6 +130,7 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
                 TotalSpent = group.Sum(order => order.TotalAmount)
             })
             .ToList();
+
 
         var maximumSpentAmount = clientTotals
             .Max(item => item.TotalSpent);
@@ -129,8 +140,8 @@ public class QueriesTests : IClassFixture<FoodDeliveryFixture>
             .OrderBy(item => item.ClientId)
             .ToList();
 
-        Assert.Single(result);
-        Assert.Equal(1, result[0].ClientId);
-        Assert.Equal(5390m, result[0].TotalSpent);
+        Assert.Equal(expectedCount, result.Count);
+        Assert.Equal(expectedClientId, result[0].ClientId);
+        Assert.Equal(expectedTotalSpent, result[0].TotalSpent);
     }
 }

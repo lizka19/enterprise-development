@@ -50,67 +50,59 @@ public class DataSeeder
     /// <returns>Список категорий блюд</returns>
     private static List<DishCategory> CreateCategories()
     {
-        return new List<DishCategory>
-        {
-            new()
+        return
+        [
+            new DishCategory
             {
                 Id = 1,
                 Name = "Пицца"
             },
-
-            new()
+            new DishCategory
             {
                 Id = 2,
                 Name = "Суши"
-            }, 
-
-            new()
+            },
+            new DishCategory
             {
                 Id = 3,
                 Name = "Бургеры"
             },
-
-            new()
+            new DishCategory
             {
                 Id = 4,
                 Name = "Супы"
             },
-
-            new()
+            new DishCategory
             {
                 Id = 5,
                 Name = "Салаты"
             },
-
-            new()
+            new DishCategory
             {
                 Id = 6,
                 Name = "Десерты"
             },
-
-            new()
+            new DishCategory
             {
                 Id = 7,
                 Name = "Напитки"
             },
-
-            new()
+            new DishCategory
             {
                 Id = 8,
                 Name = "Закуски"
             },
-            new()
+            new DishCategory
             {
                 Id = 9,
                 Name = "Паста"
             },
-
-            new()
+            new DishCategory
             {
                 Id = 10,
                 Name = "Горячие блюда"
             }
-        };
+        ];
     }
 
     /// <summary>
@@ -119,9 +111,9 @@ public class DataSeeder
     /// <returns>Список ресторанов</returns>
     private static List<Restaurant> CreateRestaurants()
     {
-        return new List<Restaurant>
-        {
-            new()
+        return
+        [
+            new Restaurant
             {
                 Id = 1,
                 Name = "Сицилия",
@@ -130,8 +122,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(10, 0),
                 ClosingTime = new TimeOnly(23, 0)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 2,
                 Name = "Токио",
@@ -140,8 +131,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(11, 0),
                 ClosingTime = new TimeOnly(23, 30)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 3,
                 Name = "Burger House",
@@ -150,8 +140,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(9, 0),
                 ClosingTime = new TimeOnly(22, 0)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 4,
                 Name = "Хачапури",
@@ -160,8 +149,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(10, 0),
                 ClosingTime = new TimeOnly(23, 0)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 5,
                 Name = "Вилка",
@@ -170,8 +158,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(8, 0),
                 ClosingTime = new TimeOnly(21, 0)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 6,
                 Name = "Паста Бар",
@@ -180,8 +167,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(11, 0),
                 ClosingTime = new TimeOnly(23, 0)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 7,
                 Name = "Шашлык №1",
@@ -190,8 +176,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(10, 0),
                 ClosingTime = new TimeOnly(22, 0)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 8,
                 Name = "Green Food",
@@ -200,8 +185,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(9, 0),
                 ClosingTime = new TimeOnly(21, 0)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 9,
                 Name = "Sweet Home",
@@ -210,8 +194,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(9, 0),
                 ClosingTime = new TimeOnly(22, 0)
             },
-
-            new()
+            new Restaurant
             {
                 Id = 10,
                 Name = "Горячий двор",
@@ -220,7 +203,7 @@ public class DataSeeder
                 OpeningTime = new TimeOnly(10, 0),
                 ClosingTime = new TimeOnly(23, 0)
             }
-        };
+        ];
     }
 
     /// <summary>
@@ -229,244 +212,226 @@ public class DataSeeder
     /// <returns>Список клиентов</returns>
     private static List<Client> CreateClients()
     {
-        return new List<Client>
-        {
-            new()
+        return
+        [
+            new Client
             {
                 Id = 1,
                 FullName = "Иванов Иван Иванович",
                 PhoneNumber = "+79991234501",
                 DeliveryAddress = "ул. Гагарина, 10"
             },
-
-            new()
+            new Client
             {
                 Id = 2,
                 FullName = "Петров Пётр Сергеевич",
                 PhoneNumber = "+79991234502",
                 DeliveryAddress = "ул. Московская, 25"
             },
-
-            new()
+            new Client
             {
                 Id = 3,
                 FullName = "Сидорова Анна Андреевна",
                 PhoneNumber = "+79991234503",
                 DeliveryAddress = "ул. Победы, 15"
             },
-
-            new()
+            new Client
             {
                 Id = 4,
                 FullName = "Кузнецов Алексей Олегович",
                 PhoneNumber = "+79991234504",
                 DeliveryAddress = "ул. Ленинградская, 40"
             },
-
-            new()
+            new Client
             {
                 Id = 5,
                 FullName = "Смирнова Екатерина Павловна",
                 PhoneNumber = "+79991234505",
                 DeliveryAddress = "ул. Советской Армии, 30"
             },
-
-            new()
+            new Client
             {
                 Id = 6,
                 FullName = "Попов Дмитрий Игоревич",
                 PhoneNumber = "+79991234506",
                 DeliveryAddress = "ул. Самарская, 81"
             },
-
-            new()
+            new Client
             {
                 Id = 7,
                 FullName = "Соколова Мария Олеговна",
                 PhoneNumber = "+79991234507",
                 DeliveryAddress = "ул. Осипенко, 12"
             },
-
-            new()
+            new Client
             {
                 Id = 8,
                 FullName = "Морозов Артём Сергеевич",
                 PhoneNumber = "+79991234508",
                 DeliveryAddress = "ул. Полевая, 55"
             },
-
-            new()
+            new Client
             {
                 Id = 9,
                 FullName = "Волкова Алина Романовна",
                 PhoneNumber = "+79991234509",
                 DeliveryAddress = "ул. Авроры, 100"
             },
-
-            new()
+            new Client
             {
                 Id = 10,
                 FullName = "Орлов Максим Евгеньевич",
                 PhoneNumber = "+79991234510",
                 DeliveryAddress = "Московское шоссе, 20"
             }
-        };
+        ];
     }
 
     /// <summary>
     /// Создаёт список блюд
     /// </summary>
+    /// <param name="categories">Список категорий блюд</param>
+    /// <param name="restaurants">Список ресторанов</param>
     /// <returns>Список блюд</returns>
     private static List<Dish> CreateDishes(
         List<DishCategory> categories,
         List<Restaurant> restaurants)
     {
-        return new List<Dish>
-        {
-            new()
+        return
+        [
+            new Dish
             {
                 Id = 1,
                 Name = "Пепперони",
-                WeightInGrams = 450,
+                Weight = 450,
                 Price = 520,
                 CategoryId = 1,
                 Category = categories[0],
                 RestaurantId = 1,
                 Restaurant = restaurants[0]
             },
-
-            new()
+            new Dish
             {
                 Id = 2,
                 Name = "Маргарита",
-                WeightInGrams = 420,
+                Weight = 420,
                 Price = 450,
                 CategoryId = 1,
                 Category = categories[0],
                 RestaurantId = 1,
                 Restaurant = restaurants[0]
             },
-
-            new()
+            new Dish
             {
                 Id = 3,
                 Name = "Филадельфия",
-                WeightInGrams = 260,
+                Weight = 260,
                 Price = 650,
                 CategoryId = 2,
                 Category = categories[1],
                 RestaurantId = 2,
                 Restaurant = restaurants[1]
             },
-
-            new()
+            new Dish
             {
                 Id = 4,
                 Name = "Калифорния",
-                WeightInGrams = 240,
+                Weight = 240,
                 Price = 590,
                 CategoryId = 2,
                 Category = categories[1],
                 RestaurantId = 2,
                 Restaurant = restaurants[1]
             },
-
-            new()
+            new Dish
             {
                 Id = 5,
                 Name = "Чизбургер",
-                WeightInGrams = 320,
+                Weight = 320,
                 Price = 390,
                 CategoryId = 3,
                 Category = categories[2],
                 RestaurantId = 3,
                 Restaurant = restaurants[2]
             },
-
-            new()
+            new Dish
             {
                 Id = 6,
                 Name = "Хачапури по-аджарски",
-                WeightInGrams = 400,
+                Weight = 400,
                 Price = 480,
                 CategoryId = 10,
                 Category = categories[9],
                 RestaurantId = 4,
                 Restaurant = restaurants[3]
             },
-
-            new()
+            new Dish
             {
                 Id = 7,
                 Name = "Борщ",
-                WeightInGrams = 350,
+                Weight = 350,
                 Price = 300,
                 CategoryId = 4,
                 Category = categories[3],
                 RestaurantId = 5,
                 Restaurant = restaurants[4]
             },
-
-            new()
+            new Dish
             {
                 Id = 8,
                 Name = "Карбонара",
-                WeightInGrams = 330,
+                Weight = 330,
                 Price = 510,
                 CategoryId = 9,
                 Category = categories[8],
                 RestaurantId = 6,
                 Restaurant = restaurants[5]
             },
-
-            new()
+            new Dish
             {
                 Id = 9,
                 Name = "Шашлык из свинины",
-                WeightInGrams = 300,
+                Weight = 300,
                 Price = 560,
                 CategoryId = 10,
                 Category = categories[9],
                 RestaurantId = 7,
                 Restaurant = restaurants[6]
             },
-
-            new()
+            new Dish
             {
                 Id = 10,
                 Name = "Цезарь",
-                WeightInGrams = 250,
+                Weight = 250,
                 Price = 420,
                 CategoryId = 5,
                 Category = categories[4],
                 RestaurantId = 8,
                 Restaurant = restaurants[7]
             },
-
-            new()
+            new Dish
             {
                 Id = 11,
                 Name = "Чизкейк",
-                WeightInGrams = 180,
+                Weight = 180,
                 Price = 350,
                 CategoryId = 6,
                 Category = categories[5],
                 RestaurantId = 9,
                 Restaurant = restaurants[8]
             },
-
-            new()
+            new Dish
             {
                 Id = 12,
                 Name = "Лимонад",
-                WeightInGrams = 500,
+                Weight = 500,
                 Price = 230,
                 CategoryId = 7,
                 Category = categories[6],
                 RestaurantId = 10,
                 Restaurant = restaurants[9]
             }
-        };
+        ];
     }
 
     /// <summary>
@@ -481,9 +446,9 @@ public class DataSeeder
         List<Restaurant> restaurants,
         List<Dish> dishes)
     {
-        return new List<Order>
-        {
-            new()
+        return
+        [
+            new Order
             {
                 Id = 1,
                 ClientId = 1,
@@ -494,8 +459,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 1, 12, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 1, 12, 30, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 2,
                 ClientId = 2,
@@ -506,8 +470,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 2, 13, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 2, 13, 25, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 3,
                 ClientId = 3,
@@ -518,8 +481,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 3, 18, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 3, 18, 20, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 4,
                 ClientId = 1,
@@ -530,8 +492,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 4, 19, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 4, 19, 20, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 5,
                 ClientId = 4,
@@ -542,8 +503,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 5, 12, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 5, 12, 40, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 6,
                 ClientId = 5,
@@ -554,8 +514,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 6, 14, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 6, 14, 35, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 7,
                 ClientId = 1,
@@ -566,8 +525,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 7, 18, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 7, 18, 45, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 8,
                 ClientId = 6,
@@ -578,8 +536,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 8, 16, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 8, 16, 15, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 9,
                 ClientId = 7,
@@ -590,8 +547,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 9, 16, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 9, 16, 30, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 10,
                 ClientId = 1,
@@ -602,8 +558,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 10, 16, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 10, 16, 15, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 11,
                 ClientId = 8,
@@ -614,8 +569,7 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 11, 12, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 11, 12, 25, 0, TimeSpan.Zero)
             },
-
-            new()
+            new Order
             {
                 Id = 12,
                 ClientId = 9,
@@ -626,6 +580,6 @@ public class DataSeeder
                 CreatedAt = new DateTimeOffset(2026, 9, 12, 13, 0, 0, TimeSpan.Zero),
                 DeliveredAt = new DateTimeOffset(2026, 9, 12, 13, 40, 0, TimeSpan.Zero)
             }
-        };
+        ];
     }
 }
