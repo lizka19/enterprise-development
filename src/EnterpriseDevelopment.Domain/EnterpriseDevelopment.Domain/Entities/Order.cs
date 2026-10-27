@@ -18,7 +18,7 @@ public class Order
     /// <summary>
     /// Клиент, оформивший заказ
     /// </summary>
-    public required Client Client { get; set; }
+    public Client? Client { get; set; }
 
     /// <summary>
     /// Идентификатор ресторана
@@ -28,7 +28,7 @@ public class Order
     /// <summary>
     /// Ресторан, из которого оформлен заказ
     /// </summary>
-    public required Restaurant Restaurant { get; set; }
+    public Restaurant? Restaurant { get; set; }
 
     /// <summary>
     /// Блюда, входящие в заказ

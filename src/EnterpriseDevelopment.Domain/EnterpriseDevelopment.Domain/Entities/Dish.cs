@@ -33,7 +33,7 @@ public class Dish
     /// <summary>
     /// Категория блюда
     /// </summary>
-    public required DishCategory Category { get; set; }
+    public DishCategory? Category { get; set; }
 
     /// <summary>
     /// Идентификатор ресторана
@@ -43,5 +43,5 @@ public class Dish
     /// <summary>
     /// Ресторан, в котором доступно блюдо
     /// </summary>
-    public required Restaurant Restaurant { get; set; }
+    public Restaurant? Restaurant { get; set; }
 }
