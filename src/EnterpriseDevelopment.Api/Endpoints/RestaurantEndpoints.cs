@@ -1,4 +1,5 @@
-﻿using EnterpriseDevelopment.Domain;
+﻿using EnterpriseDevelopment.Application.Interfaces;
+using EnterpriseDevelopment.Domain;
 using EnterpriseDevelopment.Domain.Entities;
 namespace EnterpriseDevelopment.Api.Endpoints;
 
@@ -6,14 +7,15 @@ public static class RestaurantEndpoints
 {
     public static void MapRestaurantEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/restaurants", (DataSeeder data) =>
+
+        app.MapGet("/api/restaurants", (IRestaurantService service) =>
         {
-            return Results.Ok(data.Restaurants);
+            return Results.Ok(service.GetAll());
         });
 
-        app.MapGet("/api/restaurants/{id:int}", (int id, DataSeeder data) =>
+        app.MapGet("/api/restaurants/{id:int}", (int id, IRestaurantService service) =>
         {
-            var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == id);
+            var restaurant = service.GetById(id);
 
             if (restaurant == null)
             {
@@ -23,7 +25,8 @@ public static class RestaurantEndpoints
             return Results.Ok(restaurant);
         });
 
-        app.MapPost("/api/restaurants", (Restaurant restaurant, DataSeeder data) =>
+
+        app.MapPost("/api/restaurants", (Restaurant restaurant, IRestaurantService service) =>
         {
             if (string.IsNullOrWhiteSpace(restaurant.Name) ||
                 string.IsNullOrWhiteSpace(restaurant.Address) ||
@@ -33,19 +36,16 @@ public static class RestaurantEndpoints
                 return Results.BadRequest("Некорректные данные ресторана");
             }
 
-            restaurant.Id = data.Restaurants.Max(r => r.Id) + 1;
+            var createdRestaurant = service.Create(restaurant);
 
-            data.Restaurants.Add(restaurant);
-
-            return Results.Created($"/api/restaurants/{restaurant.Id}", restaurant);
+            return Results.Created(
+                $"/api/restaurants/{createdRestaurant.Id}",
+                createdRestaurant);
         });
 
-
-        app.MapPut("/api/restaurants/{id:int}", (int id, Restaurant updatedRestaurant, DataSeeder data) =>
+        app.MapPut("/api/restaurants/{id:int}", (int id, Restaurant updatedRestaurant, IRestaurantService service) =>
         {
-            var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == id);
-
-            if (restaurant == null)
+            if (service.GetById(id) == null)
             {
                 return Results.NotFound("Ресторан не найден");
             }
@@ -58,32 +58,25 @@ public static class RestaurantEndpoints
                 return Results.BadRequest("Некорректные данные ресторана");
             }
 
-            restaurant.Name = updatedRestaurant.Name;
-            restaurant.Address = updatedRestaurant.Address;
-            restaurant.Rating = updatedRestaurant.Rating;
-            restaurant.OpeningTime = updatedRestaurant.OpeningTime;
-            restaurant.ClosingTime = updatedRestaurant.ClosingTime;
+            service.Update(id, updatedRestaurant);
 
-            return Results.Ok(restaurant);
+            return Results.Ok(service.GetById(id));
         });
 
-        app.MapDelete("/api/restaurants/{id:int}", (int id, DataSeeder data) =>
+        app.MapDelete("/api/restaurants/{id:int}", (int id, IRestaurantService service) =>
         {
-            var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == id);
+            var restaurant = service.GetById(id);
 
             if (restaurant == null)
             {
                 return Results.NotFound("Ресторан не найден");
             }
 
-            if (data.Dishes.Any(d => d.RestaurantId == id) ||
-                data.Orders.Any(o => o.RestaurantId == id))
+            if (!service.Delete(id))
             {
                 return Results.Conflict(
                     "Нельзя удалить ресторан, у которого есть блюда или заказы");
             }
-
-            data.Restaurants.Remove(restaurant);
 
             return Results.NoContent();
         });

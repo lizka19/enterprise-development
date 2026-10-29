@@ -1,3 +1,5 @@
+using EnterpriseDevelopment.Application.Interfaces;
+using EnterpriseDevelopment.Application.Services;
 using EnterpriseDevelopment.Api.Endpoints;
 using EnterpriseDevelopment.Domain;
 
@@ -6,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Регистрация сервисов
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<DataSeeder>();
+builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 
 var app = builder.Build();
 
