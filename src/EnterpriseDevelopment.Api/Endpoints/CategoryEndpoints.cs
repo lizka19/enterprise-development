@@ -4,8 +4,14 @@ using EnterpriseDevelopment.Domain.Entities;
 
 namespace EnterpriseDevelopment.Api.Endpoints;
 
+/// <summary>
+/// Содержит HTTP-обработчики для управления категориями блюд
+/// </summary>
 public static class CategoryEndpoints
 {
+    /// <summary>
+    /// Регистрирует маршруты для получения, создания, изменения и удаления категорий блюд
+    /// </summary>
     public static void MapCategoryEndpoints(this WebApplication app)
     {
         app.MapGet("/api/categories", (ICategoryService service) =>

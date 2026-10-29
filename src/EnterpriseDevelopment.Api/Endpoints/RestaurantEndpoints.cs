@@ -3,8 +3,14 @@ using EnterpriseDevelopment.Domain;
 using EnterpriseDevelopment.Domain.Entities;
 namespace EnterpriseDevelopment.Api.Endpoints;
 
+/// <summary>
+/// Содержит HTTP-обработчики для управления ресторанами
+/// </summary>
 public static class RestaurantEndpoints
 {
+    /// <summary>
+    /// Регистрирует маршруты для получения, создания, изменения и удаления ресторанов
+    /// </summary>
     public static void MapRestaurantEndpoints(this WebApplication app)
     {
 

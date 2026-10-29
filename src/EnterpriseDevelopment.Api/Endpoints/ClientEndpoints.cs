@@ -3,8 +3,15 @@ using EnterpriseDevelopment.Domain.Entities;
 
 namespace EnterpriseDevelopment.Api.Endpoints;
 
+/// <summary>
+/// Содержит HTTP-обработчики для управления клиентами
+/// сервиса доставки еды
+/// </summary>
 public static class ClientEndpoints
 {
+    /// <summary>
+    /// Регистрирует маршруты для получения, создания, изменения и удаления клиентов
+    /// </summary>
     public static void MapClientEndpoints(this WebApplication app)
     {
         app.MapGet("/api/clients", (IClientService service) =>

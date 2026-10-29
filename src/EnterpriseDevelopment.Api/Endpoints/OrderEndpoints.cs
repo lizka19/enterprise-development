@@ -5,8 +5,14 @@ using EnterpriseDevelopment.Domain.Entities;
 
 namespace EnterpriseDevelopment.Api.Endpoints;
 
+/// <summary>
+/// Содержит HTTP-обработчики для управления заказами сервиса доставки еды
+/// </summary>
 public static class OrderEndpoints
 {
+    /// <summary>
+    /// Регистрирует маршруты для получения, создания, изменения и удаления заказов
+    /// </summary>
     public static void MapOrderEndpoints(this WebApplication app)
     {
         app.MapGet("/api/orders", (IOrderService service) =>
@@ -83,6 +89,12 @@ public static class OrderEndpoints
         });
     }
 
+    /// <summary>
+    /// Проверяет корректность данных заказа перед его созданием или изменением
+    /// </summary>
+    /// <returns>
+    /// Сообщение об ошибке, если данные некорректны; иначе null
+    /// </returns>
     private static string? ValidateOrder(CreateOrderRequest request, DataSeeder data)
     {
         if (!data.Clients.Any(c => c.Id == request.ClientId))

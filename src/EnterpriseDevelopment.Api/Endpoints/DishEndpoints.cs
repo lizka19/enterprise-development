@@ -4,8 +4,14 @@ using EnterpriseDevelopment.Domain.Entities;
 
 namespace EnterpriseDevelopment.Api.Endpoints;
 
+/// <summary>
+/// Содержит HTTP-обработчики для управления блюдами ресторанов
+/// </summary>
 public static class DishEndpoints
 {
+    /// <summary>
+    /// Регистрирует маршруты для получения, создания, изменения и удаления блюд
+    /// </summary>
     public static void MapDishEndpoints(this WebApplication app)
     {
         app.MapGet("/api/dishes", (IDishService service) =>

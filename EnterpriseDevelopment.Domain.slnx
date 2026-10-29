@@ -2,5 +2,6 @@
   <Project Path="src/EnterpriseDevelopment.Api/EnterpriseDevelopment.Api.csproj" Id="e36cc57d-580d-4891-bcf9-5901005fc47b" />
   <Project Path="src/EnterpriseDevelopment.Application/EnterpriseDevelopment.Application.csproj" Id="a915de2e-361c-4b4a-b7d5-a3789098fb2a" />
   <Project Path="src/EnterpriseDevelopment.Domain/EnterpriseDevelopment.Domain/EnterpriseDevelopment.Domain.csproj" />
+  <Project Path="src/TEnterpriseDevelopment.Application.Tests/EnterpriseDevelopment.Application.Tests.csproj" Id="037abb5d-f722-4f6c-b418-61305ff0f6dc" />
   <Project Path="tests/EnterpriseDevelopment.Domain.Tests/EnterpriseDevelopment.Domain.Tests.csproj" Id="10f23614-4ea1-4cfb-9463-e612a9f20f21" />
 </Solution>
