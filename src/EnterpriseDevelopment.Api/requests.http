@@ -105,3 +105,30 @@ Content-Type: application/json
   "createdAt": "2026-10-29T14:00:00+04:00",
   "deliveredAt": "2026-10-29T14:50:00+04:00"
 }
+
+### Удаление ресторана со связанными блюдами
+DELETE https://localhost:7008/api/restaurants/1
+
+### Удаление ресторана без связанных записей
+DELETE https://localhost:7008/api/restaurants/11
+
+### Удаление клиента с существующими заказами
+DELETE https://localhost:7008/api/clients/1
+
+### Удаление клиента без заказов
+DELETE https://localhost:7008/api/clients/11
+
+### Удаление категории со связанными блюдами
+DELETE https://localhost:7008/api/categories/1
+
+### Удаление категории без связанных блюд
+DELETE https://localhost:7008/api/categories/11
+
+### Удаление блюда, которое используется в заказах
+DELETE https://localhost:7008/api/dishes/1
+
+### Удаление блюда без связанных заказов
+DELETE https://localhost:7008/api/dishes/13
+
+### Удаление заказа
+DELETE https://localhost:7008/api/orders/1

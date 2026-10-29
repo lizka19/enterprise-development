@@ -98,6 +98,27 @@ app.MapPut("/api/restaurants/{id:int}", (int id, Restaurant updatedRestaurant, D
     return Results.Ok(restaurant);
 });
 
+app.MapDelete("/api/restaurants/{id:int}", (int id, DataSeeder data) =>
+{
+    var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == id);
+
+    if (restaurant == null)
+    {
+        return Results.NotFound("Ресторан не найден");
+    }
+
+    if (data.Dishes.Any(d => d.RestaurantId == id) ||
+        data.Orders.Any(o => o.RestaurantId == id))
+    {
+        return Results.Conflict(
+            "Нельзя удалить ресторан, у которого есть блюда или заказы");
+    }
+
+    data.Restaurants.Remove(restaurant);
+
+    return Results.NoContent();
+});
+
 app.MapGet("/api/clients", (DataSeeder data) =>
 {
     return Results.Ok(data.Clients);
@@ -152,6 +173,26 @@ app.MapPut("/api/clients/{id:int}", (int id, Client updatedClient, DataSeeder da
     client.DeliveryAddress = updatedClient.DeliveryAddress;
 
     return Results.Ok(client);
+});
+
+app.MapDelete("/api/clients/{id:int}", (int id, DataSeeder data) =>
+{
+    var client = data.Clients.FirstOrDefault(c => c.Id == id);
+
+    if (client == null)
+    {
+        return Results.NotFound("Клиент не найден");
+    }
+
+    if (data.Orders.Any(o => o.ClientId == id))
+    {
+        return Results.Conflict(
+            "Нельзя удалить клиента, у которого есть заказы");
+    }
+
+    data.Clients.Remove(client);
+
+    return Results.NoContent();
 });
 
 app.MapGet("/api/dishes", (DataSeeder data) =>
@@ -257,6 +298,26 @@ app.MapPut("/api/dishes/{id:int}", (int id, Dish updatedDish, DataSeeder data) =
     return Results.Ok(dish);
 });
 
+app.MapDelete("/api/dishes/{id:int}", (int id, DataSeeder data) =>
+{
+    var dish = data.Dishes.FirstOrDefault(d => d.Id == id);
+
+    if (dish == null)
+    {
+        return Results.NotFound("Блюдо не найдено");
+    }
+
+    if (data.Orders.Any(o => o.Dishes.Any(d => d.Id == id)))
+    {
+        return Results.Conflict(
+            "Нельзя удалить блюдо, которое используется в заказах");
+    }
+
+    data.Dishes.Remove(dish);
+
+    return Results.NoContent();
+});
+
 app.MapGet("/api/categories/{id:int}", (int id, DataSeeder data) =>
 {
     var category = data.Categories.FirstOrDefault(c => c.Id == id);
@@ -303,6 +364,26 @@ app.MapPut("/api/categories/{id:int}", (int id, DishCategory updatedCategory, Da
     category.Name = updatedCategory.Name;
 
     return Results.Ok(category);
+});
+
+app.MapDelete("/api/categories/{id:int}", (int id, DataSeeder data) =>
+{
+    var category = data.Categories.FirstOrDefault(c => c.Id == id);
+
+    if (category == null)
+    {
+        return Results.NotFound("Категория не найдена");
+    }
+
+    if (data.Dishes.Any(d => d.CategoryId == id))
+    {
+        return Results.Conflict(
+            "Нельзя удалить категорию, в которой есть блюда");
+    }
+
+    data.Categories.Remove(category);
+
+    return Results.NoContent();
 });
 
 app.MapGet("/api/orders", (DataSeeder data) =>
@@ -446,6 +527,20 @@ app.MapPut("/api/orders/{id:int}", (int id, CreateOrderRequest request, DataSeed
     order.DeliveredAt = request.DeliveredAt;
 
     return Results.Ok(order);
+});
+
+app.MapDelete("/api/orders/{id:int}", (int id, DataSeeder data) =>
+{
+    var order = data.Orders.FirstOrDefault(o => o.Id == id);
+
+    if (order == null)
+    {
+        return Results.NotFound("Заказ не найден");
+    }
+
+    data.Orders.Remove(order);
+
+    return Results.NoContent();
 });
 
 app.Run();
