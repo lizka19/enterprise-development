@@ -14,4 +14,9 @@
     <ProjectReference Include="..\EnterpriseDevelopment.Domain\EnterpriseDevelopment.Domain\EnterpriseDevelopment.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="Requests\" />
+  </ItemGroup>
+
 </Project>
