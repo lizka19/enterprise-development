@@ -1,4 +1,4 @@
-﻿using EnterpriseDevelopment.Domain;
+﻿using EnterpriseDevelopment.Application.Interfaces;
 using EnterpriseDevelopment.Domain.Entities;
 
 namespace EnterpriseDevelopment.Api.Endpoints;
@@ -7,14 +7,14 @@ public static class ClientEndpoints
 {
     public static void MapClientEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/clients", (DataSeeder data) =>
+        app.MapGet("/api/clients", (IClientService service) =>
         {
-            return Results.Ok(data.Clients);
+            return Results.Ok(service.GetAll());
         });
 
-        app.MapGet("/api/clients/{id:int}", (int id, DataSeeder data) =>
+        app.MapGet("/api/clients/{id:int}", (int id, IClientService service) =>
         {
-            var client = data.Clients.FirstOrDefault(c => c.Id == id);
+            var client = service.GetById(id);
 
             if (client == null)
             {
@@ -24,7 +24,7 @@ public static class ClientEndpoints
             return Results.Ok(client);
         });
 
-        app.MapPost("/api/clients", (Client client, DataSeeder data) =>
+        app.MapPost("/api/clients", (Client client, IClientService service) =>
         {
             if (string.IsNullOrWhiteSpace(client.FullName) ||
                 string.IsNullOrWhiteSpace(client.PhoneNumber) ||
@@ -33,18 +33,14 @@ public static class ClientEndpoints
                 return Results.BadRequest("Некорректные данные клиента");
             }
 
-            client.Id = data.Clients.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
+            var createdClient = service.Create(client);
 
-            data.Clients.Add(client);
-
-            return Results.Created($"/api/clients/{client.Id}", client);
+            return Results.Created($"/api/clients/{createdClient.Id}", createdClient);
         });
 
-        app.MapPut("/api/clients/{id:int}", (int id, Client updatedClient, DataSeeder data) =>
+        app.MapPut("/api/clients/{id:int}", (int id, Client updatedClient, IClientService service) =>
         {
-            var client = data.Clients.FirstOrDefault(c => c.Id == id);
-
-            if (client == null)
+            if (service.GetById(id) == null)
             {
                 return Results.NotFound("Клиент не найден");
             }
@@ -56,29 +52,22 @@ public static class ClientEndpoints
                 return Results.BadRequest("Некорректные данные клиента");
             }
 
-            client.FullName = updatedClient.FullName;
-            client.PhoneNumber = updatedClient.PhoneNumber;
-            client.DeliveryAddress = updatedClient.DeliveryAddress;
+            service.Update(id, updatedClient);
 
-            return Results.Ok(client);
+            return Results.Ok(service.GetById(id));
         });
 
-        app.MapDelete("/api/clients/{id:int}", (int id, DataSeeder data) =>
+        app.MapDelete("/api/clients/{id:int}", (int id, IClientService service) =>
         {
-            var client = data.Clients.FirstOrDefault(c => c.Id == id);
-
-            if (client == null)
+            if (service.GetById(id) == null)
             {
                 return Results.NotFound("Клиент не найден");
             }
 
-            if (data.Orders.Any(o => o.ClientId == id))
+            if (!service.Delete(id))
             {
-                return Results.Conflict(
-                    "Нельзя удалить клиента, у которого есть заказы");
+                return Results.Conflict("Нельзя удалить клиента, у которого есть заказы");
             }
-
-            data.Clients.Remove(client);
 
             return Results.NoContent();
         });

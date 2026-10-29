@@ -1,4 +1,5 @@
-﻿using EnterpriseDevelopment.Domain;
+﻿
+using EnterpriseDevelopment.Application.Interfaces;
 using EnterpriseDevelopment.Domain.Entities;
 
 namespace EnterpriseDevelopment.Api.Endpoints;
@@ -7,12 +8,14 @@ public static class CategoryEndpoints
 {
     public static void MapCategoryEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/categories", (DataSeeder data) =>
+        app.MapGet("/api/categories", (ICategoryService service) =>
         {
-            return Results.Ok(data.Categories);
-        }); app.MapGet("/api/categories/{id:int}", (int id, DataSeeder data) =>
+            return Results.Ok(service.GetAll());
+        });
+
+        app.MapGet("/api/categories/{id:int}", (int id, ICategoryService service) =>
         {
-            var category = data.Categories.FirstOrDefault(c => c.Id == id);
+            var category = service.GetById(id);
 
             if (category == null)
             {
@@ -22,28 +25,23 @@ public static class CategoryEndpoints
             return Results.Ok(category);
         });
 
-        app.MapPost("/api/categories", (DishCategory category, DataSeeder data) =>
+        app.MapPost("/api/categories", (DishCategory category, ICategoryService service) =>
         {
             if (string.IsNullOrWhiteSpace(category.Name))
             {
                 return Results.BadRequest("Название категории не может быть пустым");
             }
 
-            category.Id = data.Categories
-                .Select(c => c.Id)
-                .DefaultIfEmpty(0)
-                .Max() + 1;
+            var createdCategory = service.Create(category);
 
-            data.Categories.Add(category);
-
-            return Results.Created($"/api/categories/{category.Id}", category);
+            return Results.Created(
+                $"/api/categories/{createdCategory.Id}",
+                createdCategory);
         });
 
-        app.MapPut("/api/categories/{id:int}", (int id, DishCategory updatedCategory, DataSeeder data) =>
+        app.MapPut("/api/categories/{id:int}", (int id, DishCategory updatedCategory, ICategoryService service) =>
         {
-            var category = data.Categories.FirstOrDefault(c => c.Id == id);
-
-            if (category == null)
+            if (service.GetById(id) == null)
             {
                 return Results.NotFound("Категория не найдена");
             }
@@ -53,27 +51,23 @@ public static class CategoryEndpoints
                 return Results.BadRequest("Название категории не может быть пустым");
             }
 
-            category.Name = updatedCategory.Name;
+            service.Update(id, updatedCategory);
 
-            return Results.Ok(category);
+            return Results.Ok(service.GetById(id));
         });
 
-        app.MapDelete("/api/categories/{id:int}", (int id, DataSeeder data) =>
+        app.MapDelete("/api/categories/{id:int}", (int id, ICategoryService service) =>
         {
-            var category = data.Categories.FirstOrDefault(c => c.Id == id);
-
-            if (category == null)
+            if (service.GetById(id) == null)
             {
                 return Results.NotFound("Категория не найдена");
             }
 
-            if (data.Dishes.Any(d => d.CategoryId == id))
+            if (!service.Delete(id))
             {
                 return Results.Conflict(
                     "Нельзя удалить категорию, в которой есть блюда");
             }
-
-            data.Categories.Remove(category);
 
             return Results.NoContent();
         });

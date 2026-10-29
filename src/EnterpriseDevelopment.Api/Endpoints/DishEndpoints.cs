@@ -1,4 +1,5 @@
-﻿using EnterpriseDevelopment.Domain;
+﻿using EnterpriseDevelopment.Application.Interfaces;
+using EnterpriseDevelopment.Domain;
 using EnterpriseDevelopment.Domain.Entities;
 
 namespace EnterpriseDevelopment.Api.Endpoints;
@@ -7,14 +8,14 @@ public static class DishEndpoints
 {
     public static void MapDishEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/dishes", (DataSeeder data) =>
+        app.MapGet("/api/dishes", (IDishService service) =>
         {
-            return Results.Ok(data.Dishes);
+            return Results.Ok(service.GetAll());
         });
 
-        app.MapGet("/api/dishes/{id:int}", (int id, DataSeeder data) =>
+        app.MapGet("/api/dishes/{id:int}", (int id, IDishService service) =>
         {
-            var dish = data.Dishes.FirstOrDefault(d => d.Id == id);
+            var dish = service.GetById(id);
 
             if (dish == null)
             {
@@ -24,8 +25,7 @@ public static class DishEndpoints
             return Results.Ok(dish);
         });
 
-
-        app.MapPost("/api/dishes", (Dish dish, DataSeeder data) =>
+        app.MapPost("/api/dishes", (Dish dish, IDishService service, DataSeeder data) =>
         {
             if (string.IsNullOrWhiteSpace(dish.Name) ||
                 dish.Price <= 0 ||
@@ -34,40 +34,24 @@ public static class DishEndpoints
                 return Results.BadRequest("Некорректные данные блюда");
             }
 
-            var category = data.Categories.FirstOrDefault(
-                c => c.Id == dish.CategoryId);
-
-            if (category == null)
+            if (!data.Categories.Any(c => c.Id == dish.CategoryId))
             {
                 return Results.BadRequest("Категория не найдена");
             }
 
-            var restaurant = data.Restaurants.FirstOrDefault(
-                r => r.Id == dish.RestaurantId);
-
-            if (restaurant == null)
+            if (!data.Restaurants.Any(r => r.Id == dish.RestaurantId))
             {
                 return Results.BadRequest("Ресторан не найден");
             }
 
-            dish.Id = data.Dishes
-                .Select(d => d.Id)
-                .DefaultIfEmpty(0)
-                .Max() + 1;
+            var createdDish = service.Create(dish);
 
-            dish.Category = category;
-            dish.Restaurant = restaurant;
-
-            data.Dishes.Add(dish);
-
-            return Results.Created($"/api/dishes/{dish.Id}", dish);
+            return Results.Created($"/api/dishes/{createdDish.Id}", createdDish);
         });
 
-        app.MapPut("/api/dishes/{id:int}", (int id, Dish updatedDish, DataSeeder data) =>
+        app.MapPut("/api/dishes/{id:int}", (int id, Dish updatedDish, IDishService service, DataSeeder data) =>
         {
-            var dish = data.Dishes.FirstOrDefault(d => d.Id == id);
-
-            if (dish == null)
+            if (service.GetById(id) == null)
             {
                 return Results.NotFound("Блюдо не найдено");
             }
@@ -79,49 +63,33 @@ public static class DishEndpoints
                 return Results.BadRequest("Некорректные данные блюда");
             }
 
-            var category = data.Categories.FirstOrDefault(
-                c => c.Id == updatedDish.CategoryId);
-
-            if (category == null)
+            if (!data.Categories.Any(c => c.Id == updatedDish.CategoryId))
             {
                 return Results.BadRequest("Категория не найдена");
             }
 
-            var restaurant = data.Restaurants.FirstOrDefault(
-                r => r.Id == updatedDish.RestaurantId);
-
-            if (restaurant == null)
+            if (!data.Restaurants.Any(r => r.Id == updatedDish.RestaurantId))
             {
                 return Results.BadRequest("Ресторан не найден");
             }
 
-            dish.Name = updatedDish.Name;
-            dish.Weight = updatedDish.Weight;
-            dish.Price = updatedDish.Price;
-            dish.CategoryId = category.Id;
-            dish.Category = category;
-            dish.RestaurantId = restaurant.Id;
-            dish.Restaurant = restaurant;
+            service.Update(id, updatedDish);
 
-            return Results.Ok(dish);
+            return Results.Ok(service.GetById(id));
         });
 
-        app.MapDelete("/api/dishes/{id:int}", (int id, DataSeeder data) =>
+        app.MapDelete("/api/dishes/{id:int}", (int id, IDishService service) =>
         {
-            var dish = data.Dishes.FirstOrDefault(d => d.Id == id);
-
-            if (dish == null)
+            if (service.GetById(id) == null)
             {
                 return Results.NotFound("Блюдо не найдено");
             }
 
-            if (data.Orders.Any(o => o.Dishes.Any(d => d.Id == id)))
+            if (!service.Delete(id))
             {
                 return Results.Conflict(
                     "Нельзя удалить блюдо, которое используется в заказах");
             }
-
-            data.Dishes.Remove(dish);
 
             return Results.NoContent();
         });

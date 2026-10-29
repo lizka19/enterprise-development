@@ -1,6 +1,7 @@
-﻿using EnterpriseDevelopment.Domain;
+﻿using EnterpriseDevelopment.Api;
+using EnterpriseDevelopment.Application.Interfaces;
+using EnterpriseDevelopment.Domain;
 using EnterpriseDevelopment.Domain.Entities;
-using EnterpriseDevelopment.Api;
 
 namespace EnterpriseDevelopment.Api.Endpoints;
 
@@ -8,14 +9,14 @@ public static class OrderEndpoints
 {
     public static void MapOrderEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/orders", (DataSeeder data) =>
+        app.MapGet("/api/orders", (IOrderService service) =>
         {
-            return Results.Ok(data.Orders);
+            return Results.Ok(service.GetAll());
         });
 
-        app.MapGet("/api/orders/{id:int}", (int id, DataSeeder data) =>
+        app.MapGet("/api/orders/{id:int}", (int id, IOrderService service) =>
         {
-            var order = data.Orders.FirstOrDefault(o => o.Id == id);
+            var order = service.GetById(id);
 
             if (order == null)
             {
@@ -25,144 +26,100 @@ public static class OrderEndpoints
             return Results.Ok(order);
         });
 
-
-        app.MapPost("/api/orders", (CreateOrderRequest request, DataSeeder data) =>
-        {
-            var client = data.Clients.FirstOrDefault(c => c.Id == request.ClientId);
-
-            if (client == null)
+        app.MapPost("/api/orders",
+            (CreateOrderRequest request, IOrderService service, DataSeeder data) =>
             {
-                return Results.BadRequest("Клиент не найден");
-            }
+                var error = ValidateOrder(request, data);
 
-            var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == request.RestaurantId);
-
-            if (restaurant == null)
-            {
-                return Results.BadRequest("Ресторан не найден");
-            }
-
-            if (request.DishIds == null || request.DishIds.Count == 0)
-            {
-                return Results.BadRequest("В заказе должны быть блюда");
-            }
-
-            var dishes = new List<Dish>();
-
-            foreach (var dishId in request.DishIds)
-            {
-                var dish = data.Dishes.FirstOrDefault(d => d.Id == dishId);
-
-                if (dish == null)
+                if (error != null)
                 {
-                    return Results.BadRequest($"Блюдо с ID {dishId} не найдено");
+                    return Results.BadRequest(error);
                 }
 
-                if (dish.RestaurantId != restaurant.Id)
+                var order = service.Create(
+                    request.ClientId,
+                    request.RestaurantId,
+                    request.DishIds,
+                    request.CreatedAt,
+                    request.DeliveredAt);
+
+                return Results.Created($"/api/orders/{order.Id}", order);
+            });
+
+        app.MapPut("/api/orders/{id:int}",
+            (int id, CreateOrderRequest request, IOrderService service, DataSeeder data) =>
+            {
+                if (service.GetById(id) == null)
                 {
-                    return Results.BadRequest("Все блюда должны принадлежать выбранному ресторану");
+                    return Results.NotFound("Заказ не найден");
                 }
 
-                dishes.Add(dish);
-            }
+                var error = ValidateOrder(request, data);
 
-            if (request.DeliveredAt < request.CreatedAt)
-            {
-                return Results.BadRequest("Время доставки не может быть раньше времени создания заказа");
-            }
+                if (error != null)
+                {
+                    return Results.BadRequest(error);
+                }
 
-            var order = new Order
-            {
-                Id = data.Orders.Select(o => o.Id).DefaultIfEmpty(0).Max() + 1,
-                ClientId = client.Id,
-                Client = client,
-                RestaurantId = restaurant.Id,
-                Restaurant = restaurant,
-                Dishes = dishes,
-                CreatedAt = request.CreatedAt,
-                DeliveredAt = request.DeliveredAt
-            };
+                service.Update(
+                    id,
+                    request.ClientId,
+                    request.RestaurantId,
+                    request.DishIds,
+                    request.CreatedAt,
+                    request.DeliveredAt);
 
-            data.Orders.Add(order);
+                return Results.Ok(service.GetById(id));
+            });
 
-            return Results.Created($"/api/orders/{order.Id}", order);
-        });
-
-        app.MapPut("/api/orders/{id:int}", (int id, CreateOrderRequest request, DataSeeder data) =>
+        app.MapDelete("/api/orders/{id:int}", (int id, IOrderService service) =>
         {
-            var order = data.Orders.FirstOrDefault(o => o.Id == id);
-
-            if (order == null)
+            if (!service.Delete(id))
             {
                 return Results.NotFound("Заказ не найден");
             }
-
-            var client = data.Clients.FirstOrDefault(c => c.Id == request.ClientId);
-
-            if (client == null)
-            {
-                return Results.BadRequest("Клиент не найден");
-            }
-
-            var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == request.RestaurantId);
-
-            if (restaurant == null)
-            {
-                return Results.BadRequest("Ресторан не найден");
-            }
-
-            if (request.DishIds == null || request.DishIds.Count == 0)
-            {
-                return Results.BadRequest("В заказе должны быть блюда");
-            }
-
-            var dishes = new List<Dish>();
-
-            foreach (var dishId in request.DishIds)
-            {
-                var dish = data.Dishes.FirstOrDefault(d => d.Id == dishId);
-
-                if (dish == null)
-                {
-                    return Results.BadRequest($"Блюдо с ID {dishId} не найдено");
-                }
-
-                if (dish.RestaurantId != restaurant.Id)
-                {
-                    return Results.BadRequest("Все блюда должны принадлежать выбранному ресторану");
-                }
-
-                dishes.Add(dish);
-            }
-
-            if (request.DeliveredAt < request.CreatedAt)
-            {
-                return Results.BadRequest("Время доставки не может быть раньше времени создания заказа");
-            }
-
-            order.ClientId = client.Id;
-            order.Client = client;
-            order.RestaurantId = restaurant.Id;
-            order.Restaurant = restaurant;
-            order.Dishes = dishes;
-            order.CreatedAt = request.CreatedAt;
-            order.DeliveredAt = request.DeliveredAt;
-
-            return Results.Ok(order);
-        });
-
-        app.MapDelete("/api/orders/{id:int}", (int id, DataSeeder data) =>
-        {
-            var order = data.Orders.FirstOrDefault(o => o.Id == id);
-
-            if (order == null)
-            {
-                return Results.NotFound("Заказ не найден");
-            }
-
-            data.Orders.Remove(order);
 
             return Results.NoContent();
         });
+    }
+
+    private static string? ValidateOrder(CreateOrderRequest request, DataSeeder data)
+    {
+        if (!data.Clients.Any(c => c.Id == request.ClientId))
+        {
+            return "Клиент не найден";
+        }
+
+        if (!data.Restaurants.Any(r => r.Id == request.RestaurantId))
+        {
+            return "Ресторан не найден";
+        }
+
+        if (request.DishIds == null || request.DishIds.Count == 0)
+        {
+            return "В заказе должны быть блюда";
+        }
+
+        foreach (var dishId in request.DishIds)
+        {
+            var dish = data.Dishes.FirstOrDefault(d => d.Id == dishId);
+
+            if (dish == null)
+            {
+                return $"Блюдо с ID {dishId} не найдено";
+            }
+
+            if (dish.RestaurantId != request.RestaurantId)
+            {
+                return "Все блюда должны принадлежать выбранному ресторану";
+            }
+        }
+
+        if (request.DeliveredAt < request.CreatedAt)
+        {
+            return "Время доставки не может быть раньше времени создания заказа";
+        }
+
+        return null;
     }
 }
