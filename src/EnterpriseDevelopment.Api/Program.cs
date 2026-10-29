@@ -71,6 +71,33 @@ app.MapPost("/api/restaurants", (Restaurant restaurant, DataSeeder data) =>
     return Results.Created($"/api/restaurants/{restaurant.Id}", restaurant);
 });
 
+
+app.MapPut("/api/restaurants/{id:int}", (int id, Restaurant updatedRestaurant, DataSeeder data) =>
+{
+    var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == id);
+
+    if (restaurant == null)
+    {
+        return Results.NotFound("Ресторан не найден");
+    }
+
+    if (string.IsNullOrWhiteSpace(updatedRestaurant.Name) ||
+        string.IsNullOrWhiteSpace(updatedRestaurant.Address) ||
+        updatedRestaurant.Rating < 0 ||
+        updatedRestaurant.Rating > 5)
+    {
+        return Results.BadRequest("Некорректные данные ресторана");
+    }
+
+    restaurant.Name = updatedRestaurant.Name;
+    restaurant.Address = updatedRestaurant.Address;
+    restaurant.Rating = updatedRestaurant.Rating;
+    restaurant.OpeningTime = updatedRestaurant.OpeningTime;
+    restaurant.ClosingTime = updatedRestaurant.ClosingTime;
+
+    return Results.Ok(restaurant);
+});
+
 app.MapGet("/api/clients", (DataSeeder data) =>
 {
     return Results.Ok(data.Clients);
@@ -102,6 +129,29 @@ app.MapPost("/api/clients", (Client client, DataSeeder data) =>
     data.Clients.Add(client);
 
     return Results.Created($"/api/clients/{client.Id}", client);
+});
+
+app.MapPut("/api/clients/{id:int}", (int id, Client updatedClient, DataSeeder data) =>
+{
+    var client = data.Clients.FirstOrDefault(c => c.Id == id);
+
+    if (client == null)
+    {
+        return Results.NotFound("Клиент не найден");
+    }
+
+    if (string.IsNullOrWhiteSpace(updatedClient.FullName) ||
+        string.IsNullOrWhiteSpace(updatedClient.PhoneNumber) ||
+        string.IsNullOrWhiteSpace(updatedClient.DeliveryAddress))
+    {
+        return Results.BadRequest("Некорректные данные клиента");
+    }
+
+    client.FullName = updatedClient.FullName;
+    client.PhoneNumber = updatedClient.PhoneNumber;
+    client.DeliveryAddress = updatedClient.DeliveryAddress;
+
+    return Results.Ok(client);
 });
 
 app.MapGet("/api/dishes", (DataSeeder data) =>
@@ -164,6 +214,49 @@ app.MapPost("/api/dishes", (Dish dish, DataSeeder data) =>
     return Results.Created($"/api/dishes/{dish.Id}", dish);
 });
 
+app.MapPut("/api/dishes/{id:int}", (int id, Dish updatedDish, DataSeeder data) =>
+{
+    var dish = data.Dishes.FirstOrDefault(d => d.Id == id);
+
+    if (dish == null)
+    {
+        return Results.NotFound("Блюдо не найдено");
+    }
+
+    if (string.IsNullOrWhiteSpace(updatedDish.Name) ||
+        updatedDish.Price <= 0 ||
+        updatedDish.Weight <= 0)
+    {
+        return Results.BadRequest("Некорректные данные блюда");
+    }
+
+    var category = data.Categories.FirstOrDefault(
+        c => c.Id == updatedDish.CategoryId);
+
+    if (category == null)
+    {
+        return Results.BadRequest("Категория не найдена");
+    }
+
+    var restaurant = data.Restaurants.FirstOrDefault(
+        r => r.Id == updatedDish.RestaurantId);
+
+    if (restaurant == null)
+    {
+        return Results.BadRequest("Ресторан не найден");
+    }
+
+    dish.Name = updatedDish.Name;
+    dish.Weight = updatedDish.Weight;
+    dish.Price = updatedDish.Price;
+    dish.CategoryId = category.Id;
+    dish.Category = category;
+    dish.RestaurantId = restaurant.Id;
+    dish.Restaurant = restaurant;
+
+    return Results.Ok(dish);
+});
+
 app.MapGet("/api/categories/{id:int}", (int id, DataSeeder data) =>
 {
     var category = data.Categories.FirstOrDefault(c => c.Id == id);
@@ -193,6 +286,24 @@ app.MapPost("/api/categories", (DishCategory category, DataSeeder data) =>
     return Results.Created($"/api/categories/{category.Id}", category);
 });
 
+app.MapPut("/api/categories/{id:int}", (int id, DishCategory updatedCategory, DataSeeder data) =>
+{
+    var category = data.Categories.FirstOrDefault(c => c.Id == id);
+
+    if (category == null)
+    {
+        return Results.NotFound("Категория не найдена");
+    }
+
+    if (string.IsNullOrWhiteSpace(updatedCategory.Name))
+    {
+        return Results.BadRequest("Название категории не может быть пустым");
+    }
+
+    category.Name = updatedCategory.Name;
+
+    return Results.Ok(category);
+});
 
 app.MapGet("/api/orders", (DataSeeder data) =>
 {
@@ -272,6 +383,69 @@ app.MapPost("/api/orders", (CreateOrderRequest request, DataSeeder data) =>
     data.Orders.Add(order);
 
     return Results.Created($"/api/orders/{order.Id}", order);
+});
+
+app.MapPut("/api/orders/{id:int}", (int id, CreateOrderRequest request, DataSeeder data) =>
+{
+    var order = data.Orders.FirstOrDefault(o => o.Id == id);
+
+    if (order == null)
+    {
+        return Results.NotFound("Заказ не найден");
+    }
+
+    var client = data.Clients.FirstOrDefault(c => c.Id == request.ClientId);
+
+    if (client == null)
+    {
+        return Results.BadRequest("Клиент не найден");
+    }
+
+    var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == request.RestaurantId);
+
+    if (restaurant == null)
+    {
+        return Results.BadRequest("Ресторан не найден");
+    }
+
+    if (request.DishIds == null || request.DishIds.Count == 0)
+    {
+        return Results.BadRequest("В заказе должны быть блюда");
+    }
+
+    var dishes = new List<Dish>();
+
+    foreach (var dishId in request.DishIds)
+    {
+        var dish = data.Dishes.FirstOrDefault(d => d.Id == dishId);
+
+        if (dish == null)
+        {
+            return Results.BadRequest($"Блюдо с ID {dishId} не найдено");
+        }
+
+        if (dish.RestaurantId != restaurant.Id)
+        {
+            return Results.BadRequest("Все блюда должны принадлежать выбранному ресторану");
+        }
+
+        dishes.Add(dish);
+    }
+
+    if (request.DeliveredAt < request.CreatedAt)
+    {
+        return Results.BadRequest("Время доставки не может быть раньше времени создания заказа");
+    }
+
+    order.ClientId = client.Id;
+    order.Client = client;
+    order.RestaurantId = restaurant.Id;
+    order.Restaurant = restaurant;
+    order.Dishes = dishes;
+    order.CreatedAt = request.CreatedAt;
+    order.DeliveredAt = request.DeliveredAt;
+
+    return Results.Ok(order);
 });
 
 app.Run();
