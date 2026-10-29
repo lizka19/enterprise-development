@@ -1,4 +1,7 @@
 using EnterpriseDevelopment.Domain;
+using EnterpriseDevelopment.Domain.Entities;
+using EnterpriseDevelopment.Api;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -51,6 +54,23 @@ app.MapGet("/api/restaurants/{id:int}", (int id, DataSeeder data) =>
     return Results.Ok(restaurant);
 });
 
+app.MapPost("/api/restaurants", (Restaurant restaurant, DataSeeder data) =>
+{
+    if (string.IsNullOrWhiteSpace(restaurant.Name) ||
+        string.IsNullOrWhiteSpace(restaurant.Address) ||
+        restaurant.Rating < 0 ||
+        restaurant.Rating > 5)
+    {
+        return Results.BadRequest("Некорректные данные ресторана");
+    }
+
+    restaurant.Id = data.Restaurants.Max(r => r.Id) + 1;
+
+    data.Restaurants.Add(restaurant);
+
+    return Results.Created($"/api/restaurants/{restaurant.Id}", restaurant);
+});
+
 app.MapGet("/api/clients", (DataSeeder data) =>
 {
     return Results.Ok(data.Clients);
@@ -66,6 +86,22 @@ app.MapGet("/api/clients/{id:int}", (int id, DataSeeder data) =>
     }
 
     return Results.Ok(client);
+});
+
+app.MapPost("/api/clients", (Client client, DataSeeder data) =>
+{
+    if (string.IsNullOrWhiteSpace(client.FullName) ||
+        string.IsNullOrWhiteSpace(client.PhoneNumber) ||
+        string.IsNullOrWhiteSpace(client.DeliveryAddress))
+    {
+        return Results.BadRequest("Некорректные данные клиента");
+    }
+
+    client.Id = data.Clients.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
+
+    data.Clients.Add(client);
+
+    return Results.Created($"/api/clients/{client.Id}", client);
 });
 
 app.MapGet("/api/dishes", (DataSeeder data) =>
@@ -90,6 +126,44 @@ app.MapGet("/api/categories", (DataSeeder data) =>
     return Results.Ok(data.Categories);
 });
 
+app.MapPost("/api/dishes", (Dish dish, DataSeeder data) =>
+{
+    if (string.IsNullOrWhiteSpace(dish.Name) ||
+        dish.Price <= 0 ||
+        dish.Weight <= 0)
+    {
+        return Results.BadRequest("Некорректные данные блюда");
+    }
+
+    var category = data.Categories.FirstOrDefault(
+        c => c.Id == dish.CategoryId);
+
+    if (category == null)
+    {
+        return Results.BadRequest("Категория не найдена");
+    }
+
+    var restaurant = data.Restaurants.FirstOrDefault(
+        r => r.Id == dish.RestaurantId);
+
+    if (restaurant == null)
+    {
+        return Results.BadRequest("Ресторан не найден");
+    }
+
+    dish.Id = data.Dishes
+        .Select(d => d.Id)
+        .DefaultIfEmpty(0)
+        .Max() + 1;
+
+    dish.Category = category;
+    dish.Restaurant = restaurant;
+
+    data.Dishes.Add(dish);
+
+    return Results.Created($"/api/dishes/{dish.Id}", dish);
+});
+
 app.MapGet("/api/categories/{id:int}", (int id, DataSeeder data) =>
 {
     var category = data.Categories.FirstOrDefault(c => c.Id == id);
@@ -101,6 +175,24 @@ app.MapGet("/api/categories/{id:int}", (int id, DataSeeder data) =>
 
     return Results.Ok(category);
 });
+
+app.MapPost("/api/categories", (DishCategory category, DataSeeder data) =>
+{
+    if (string.IsNullOrWhiteSpace(category.Name))
+    {
+        return Results.BadRequest("Название категории не может быть пустым");
+    }
+
+    category.Id = data.Categories
+        .Select(c => c.Id)
+        .DefaultIfEmpty(0)
+        .Max() + 1;
+
+    data.Categories.Add(category);
+
+    return Results.Created($"/api/categories/{category.Id}", category);
+});
+
 
 app.MapGet("/api/orders", (DataSeeder data) =>
 {
@@ -117,6 +209,69 @@ app.MapGet("/api/orders/{id:int}", (int id, DataSeeder data) =>
     }
 
     return Results.Ok(order);
+});
+
+
+app.MapPost("/api/orders", (CreateOrderRequest request, DataSeeder data) =>
+{
+    var client = data.Clients.FirstOrDefault(c => c.Id == request.ClientId);
+
+    if (client == null)
+    {
+        return Results.BadRequest("Клиент не найден");
+    }
+
+    var restaurant = data.Restaurants.FirstOrDefault(r => r.Id == request.RestaurantId);
+
+    if (restaurant == null)
+    {
+        return Results.BadRequest("Ресторан не найден");
+    }
+
+    if (request.DishIds == null || request.DishIds.Count == 0)
+    {
+        return Results.BadRequest("В заказе должны быть блюда");
+    }
+
+    var dishes = new List<Dish>();
+
+    foreach (var dishId in request.DishIds)
+    {
+        var dish = data.Dishes.FirstOrDefault(d => d.Id == dishId);
+
+        if (dish == null)
+        {
+            return Results.BadRequest($"Блюдо с ID {dishId} не найдено");
+        }
+
+        if (dish.RestaurantId != restaurant.Id)
+        {
+            return Results.BadRequest("Все блюда должны принадлежать выбранному ресторану");
+        }
+
+        dishes.Add(dish);
+    }
+
+    if (request.DeliveredAt < request.CreatedAt)
+    {
+        return Results.BadRequest("Время доставки не может быть раньше времени создания заказа");
+    }
+
+    var order = new Order
+    {
+        Id = data.Orders.Select(o => o.Id).DefaultIfEmpty(0).Max() + 1,
+        ClientId = client.Id,
+        Client = client,
+        RestaurantId = restaurant.Id,
+        Restaurant = restaurant,
+        Dishes = dishes,
+        CreatedAt = request.CreatedAt,
+        DeliveredAt = request.DeliveredAt
+    };
+
+    data.Orders.Add(order);
+
+    return Results.Created($"/api/orders/{order.Id}", order);
 });
 
 app.Run();

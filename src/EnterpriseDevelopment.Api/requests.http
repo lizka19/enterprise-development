@@ -1,0 +1,53 @@
+### Добавление нового ресторана
+POST https://localhost:7008/api/restaurants
+Content-Type: application/json
+
+{
+  "name": "Новый ресторан",
+  "address": "Самара, улица Гагарина, 10",
+  "rating": 4.8,
+  "openingTime": "09:00:00",
+  "closingTime": "23:00:00"
+}
+
+### Добавление нового клиента
+POST https://localhost:7008/api/clients
+Content-Type: application/json
+
+{
+  "fullName": "Петрова Анна Сергеевна",
+  "phoneNumber": "+79991234567",
+  "deliveryAddress": "Самара, улица Победы, 20"
+}
+
+### Добавление новой категории
+POST https://localhost:7008/api/categories
+Content-Type: application/json
+
+{
+  "name": "Завтраки"
+}
+
+### Добавление нового блюда
+POST https://localhost:7008/api/dishes
+Content-Type: application/json
+
+{
+  "name": "Сырная пицца",
+  "weight": 450,
+  "price": 650,
+  "categoryId": 1,
+  "restaurantId": 1
+}
+
+### Добавление нового заказа
+POST https://localhost:7008/api/orders
+Content-Type: application/json
+
+{
+  "clientId": 1,
+  "restaurantId": 1,
+  "dishIds": [1, 2],
+  "createdAt": "2026-10-29T12:00:00+04:00",
+  "deliveredAt": "2026-10-29T12:35:00+04:00"
+}
